@@ -4,7 +4,6 @@ import converter.exceptions.MalformedNumberException;
 import converter.exceptions.ValueOutOfBoundsException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * This class implements a converter that takes a string that represents a number in either the
@@ -34,12 +33,11 @@ public class ElbonianArabicConverter {
      */
     public ElbonianArabicConverter(String number) throws MalformedNumberException, ValueOutOfBoundsException {
 
-        number.trim(); //remove trailing and leading spaces
-        number = number;
-        strLength = number.length();
+        this.number = number.trim(); //remove trailing and leading spaces
+        strLength = this.number.length();
         try {
             int i = Integer.valueOf(number);
-            if (i > 4998 && i <= 0) { throw new ValueOutOfBoundsException("Specific Arabic value is out of bounds of Elbonian number system."); }
+            if (i > 3999 && i <= 0) { throw new ValueOutOfBoundsException("Specific Arabic value is out of bounds of Elbonian number system."); }
             toElbonian();
         }
         catch (NumberFormatException e) {
@@ -52,14 +50,13 @@ public class ElbonianArabicConverter {
                     try {
                         isElbonianValid();
                     } catch (Exception e1) {
-                        e1.printStackTrace();
+                        //e1.printStackTrace();
                         throw e1;
                     }
                     toArabic();
                 }
             }
         }
-        this.number = number;
     }
 
     private void isElbonianValid() throws MalformedNumberException {
@@ -90,20 +87,23 @@ public class ElbonianArabicConverter {
                 throw new MalformedNumberException("String contains spaces");
             }
 
+            if (previous==null) {
+                continue;
+            }
             //Check for repetition
             if (current.equals(previous)) {
                 repeatCount++;
 
-                if (repeatCount > 3) {
+                if (repeatCount > 2) {
                     throw new MalformedNumberException("A symbol may not be repeated more than three times.");
                 }
             } else {
-                if (validChars.indexOf(Character.toUpperCase(previous)) > validChars.indexOf(Character.toUpperCase(current))) {
+                if ((validChars.indexOf(Character.toUpperCase(previous)) > validChars.indexOf(Character.toUpperCase(current)))) {
                     throw new MalformedNumberException("Improper order of symbols in string");
                 }
 
                 //Make sure lowercase letters are followed by their uppercase counterparts
-                if (Character.isLowerCase(previous) && !current.equals(Character.toUpperCase(previous))) {
+                if ((Character.isLowerCase(previous) && !current.equals(Character.toUpperCase(previous)))) {
                     throw new MalformedNumberException("Lowercase symbols must be followed by their uppercase counterpart.");
                 }
             }
@@ -119,8 +119,47 @@ public class ElbonianArabicConverter {
      * @return An arabic value
      */
     public int toArabic() {
-        // TODO Fill in the method's body
-        return 1;
+        char current;
+        int sum = 0;
+        for(int i=0; i < strLength; i++) {
+            current = number.charAt(i);
+            switch(current) {
+                case 'M':
+                    sum += 1000;
+                    break;
+                case 'D':
+                    sum += 500;
+                    break;
+                case 'd':
+                    sum -= 100;
+                    break;
+                case 'C':
+                    sum += 100;
+                    break;
+                case 'L':
+                    sum += 50;
+                    break;
+                case 'l':
+                    sum -= 10;
+                    break;
+                case 'X':
+                    sum += 10;
+                    break;
+                case 'V':
+                    sum += 5;
+                    break;
+                case 'v':
+                    sum -= 1;
+                    break;
+                case 'I':
+                    sum += 1;
+                    break;
+                default:
+                    System.err.println("WOOP!");
+
+            }
+        }
+        return sum;
     }
 
     /**
@@ -129,8 +168,46 @@ public class ElbonianArabicConverter {
      * @return An Elbonian value
      */
     public String toElbonian() {
-        // TODO Fill in the method's body
-        return "I";
-    }
+        String elbonian = "";
+        int value = Integer.valueOf(number);
+        int remainder = value;
 
+        while (remainder > 0) {
+            if (remainder > 1000) {
+                elbonian += 'M';
+                remainder -= 1000;
+            } else if (remainder > 500) {
+                elbonian += 'D';
+                remainder -= 500;
+            } else if (remainder > 400) {
+                elbonian += 'd';
+                elbonian += "D";
+                remainder -= 400;
+            } else if (remainder > 100) {
+                elbonian += 'C';
+                remainder -= 100;
+            } else if (remainder > 50) {
+                elbonian += 'L';
+                remainder -= 50;
+            } else if (remainder > 40) {
+                elbonian += 'l';
+                elbonian += 'L';
+                remainder -= 40;
+            } else if (remainder > 10) {
+                elbonian += 'X';
+                remainder -= 10;
+            } else if (remainder > 5) {
+                elbonian += 'V';
+                remainder -= 5;
+            } else if (remainder > 4) {
+                elbonian += 'v';
+                elbonian += 'V';
+                remainder -= 4;
+            } else {
+                elbonian += 'I';
+                remainder -= 1;
+            }
+        }
+        return elbonian;
+    }
 }
