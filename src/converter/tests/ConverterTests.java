@@ -55,11 +55,46 @@ public class ConverterTests {
     }
 
     @Test
-    public void ArabicToElbonian3() throws MalformedNumberException, ValueOutOfBoundsException {
-        ElbonianArabicConverter converter = new ElbonianArabicConverter("3");
-        assertEquals(converter.toArabic(), "III");
+    public void ElbonianToArabicDdDLlLVvV() throws MalformedNumberException, ValueOutOfBoundsException {
+        ElbonianArabicConverter converter = new ElbonianArabicConverter(" DdDLlLVvV");
+        assertEquals(converter.toArabic(), 999);
     }
 
+    @Test
+    public void ArabicToElbonian3() throws MalformedNumberException, ValueOutOfBoundsException {
+        ElbonianArabicConverter converter = new ElbonianArabicConverter("3");
+        assertEquals(converter.toElbonian(), "III");
+    }
+
+    @Test
+    public void ArabicToElbonian5() throws MalformedNumberException, ValueOutOfBoundsException {
+        ElbonianArabicConverter converter = new ElbonianArabicConverter("5");
+        assertEquals(converter.toElbonian(), "V");
+    }
+
+    @Test
+    public void ArabicToElbonian4() throws MalformedNumberException, ValueOutOfBoundsException {
+        ElbonianArabicConverter converter = new ElbonianArabicConverter("4");
+        assertEquals(converter.toElbonian(), "vV");
+    }
+
+    @Test
+    public void ArabicToElbonian217() throws MalformedNumberException, ValueOutOfBoundsException {
+        ElbonianArabicConverter converter = new ElbonianArabicConverter("217");
+        assertEquals(converter.toElbonian(), "CCXVII");
+    }
+
+    @Test
+    public void ArabicToElbonian999() throws MalformedNumberException, ValueOutOfBoundsException {
+        ElbonianArabicConverter converter = new ElbonianArabicConverter("999");
+        assertEquals(converter.toElbonian(), "DdDLlLVvV");
+    }
+
+    @Test
+    public void ArabicToElbonian3049() throws MalformedNumberException, ValueOutOfBoundsException {
+        ElbonianArabicConverter converter = new ElbonianArabicConverter("3049");
+        assertEquals(converter.toElbonian(), "MMMlLVvV");
+    }
 
     @Test (expected = MalformedNumberException.class)
     public void ElbonianToArabicOoO() throws MalformedNumberException, ValueOutOfBoundsException {
@@ -89,6 +124,16 @@ public class ConverterTests {
     @Test (expected = MalformedNumberException.class)
     public void ElbonianToArabicBadCase3() throws MalformedNumberException, ValueOutOfBoundsException {
         new ElbonianArabicConverter("dC");
+    }
+
+    @Test (expected = MalformedNumberException.class)
+    public void ElbonianToArabicMultiple4() throws MalformedNumberException, ValueOutOfBoundsException {
+        new ElbonianArabicConverter("dDC");
+    }
+
+    @Test (expected = MalformedNumberException.class)
+    public void ElbonianToArabicMultiple9() throws MalformedNumberException, ValueOutOfBoundsException {
+        new ElbonianArabicConverter("LlLX");
     }
 
     @Test(expected = MalformedNumberException.class)

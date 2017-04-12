@@ -38,7 +38,7 @@ public class ElbonianArabicConverter {
         try {
             int i = Integer.valueOf(number);
             if (i > 3999 && i <= 0) { throw new ValueOutOfBoundsException("Specific Arabic value is out of bounds of Elbonian number system."); }
-            toElbonian();
+//            toElbonian();
         }
         catch (NumberFormatException e) {
             Character current;
@@ -50,24 +50,20 @@ public class ElbonianArabicConverter {
                     try {
                         isElbonianValid();
                     } catch (Exception e1) {
-                        //e1.printStackTrace();
                         throw e1;
                     }
-                    toArabic();
+//                    toArabic();
                 }
             }
         }
     }
 
     private void isElbonianValid() throws MalformedNumberException {
-        // TODO check to see if the number is valid, then set it equal to the string
-        //Only M,D,C,L,X,V,I and d,l, and v.  In order of first list
-        //No spaces within string, no more than 3 of the same letter in a row
-        //D,L, and V can have one lowercase in front of them
         int i; //loop counter
         int repeatCount = 0; //Counts number of same characters in a row
         Character previous;
         Character current = null;
+        boolean previousIsLower = false;
         ArrayList<Character> validChars = new ArrayList<>();
         char[] chars = new char[]{'M','d','D','C','l','L','X','v','V','I'};
         for(char mychar : chars) {
@@ -90,6 +86,13 @@ public class ElbonianArabicConverter {
             if (previous==null) {
                 continue;
             }
+            //If 2nd previous is lower (because before update)
+            if (previousIsLower && (validChars.indexOf(current) < validChars.indexOf(previous)+2)) {
+                throw new MalformedNumberException("Cannot follow lowercase-uppercase pair with next smallest character.");
+            }
+            //Set last character being lowercase flag
+            previousIsLower = Character.isLowerCase(previous);
+
             //Check for repetition
             if (current.equals(previous)) {
                 repeatCount++;
@@ -103,7 +106,7 @@ public class ElbonianArabicConverter {
                 }
 
                 //Make sure lowercase letters are followed by their uppercase counterparts
-                if ((Character.isLowerCase(previous) && !current.equals(Character.toUpperCase(previous)))) {
+                if ((previousIsLower && !current.equals(Character.toUpperCase(previous)))) {
                     throw new MalformedNumberException("Lowercase symbols must be followed by their uppercase counterpart.");
                 }
             }
@@ -173,39 +176,42 @@ public class ElbonianArabicConverter {
         int remainder = value;
 
         while (remainder > 0) {
-            if (remainder > 1000) {
+            if (remainder >= 1000) {
                 elbonian += 'M';
                 remainder -= 1000;
-            } else if (remainder > 500) {
+            } else if (remainder >= 500) {
                 elbonian += 'D';
                 remainder -= 500;
-            } else if (remainder > 400) {
+            } else if (remainder >= 400) {
                 elbonian += 'd';
                 elbonian += "D";
                 remainder -= 400;
-            } else if (remainder > 100) {
+            } else if (remainder >= 100) {
                 elbonian += 'C';
                 remainder -= 100;
-            } else if (remainder > 50) {
+            } else if (remainder >= 50) {
                 elbonian += 'L';
                 remainder -= 50;
-            } else if (remainder > 40) {
+            } else if (remainder >= 40) {
                 elbonian += 'l';
                 elbonian += 'L';
                 remainder -= 40;
-            } else if (remainder > 10) {
+            } else if (remainder >= 10) {
                 elbonian += 'X';
                 remainder -= 10;
-            } else if (remainder > 5) {
+            } else if (remainder >= 5) {
                 elbonian += 'V';
                 remainder -= 5;
-            } else if (remainder > 4) {
+            } else if (remainder >= 4) {
                 elbonian += 'v';
                 elbonian += 'V';
                 remainder -= 4;
-            } else {
+            } else if (remainder >= 1){
                 elbonian += 'I';
                 remainder -= 1;
+            }
+            else {
+                System.err.println("Critical Error creating Elbonian!!!");
             }
         }
         return elbonian;
